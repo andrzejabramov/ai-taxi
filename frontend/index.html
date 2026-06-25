@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Корпоративное такси</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <div id="map"></div>
+
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>🚕 Такси-агент</h2>
+        </div>
+
+        <div id="chat"></div>
+
+        <div class="controls">
+          <input id="address" placeholder="Куда поедем? (адрес)" />
+          <div class="button-row">
+            <button id="btn-search">🔍 Найти</button>
+            <button id="btn-order" disabled>🚕 Заказать</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

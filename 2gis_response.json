@@ -1,0 +1,253 @@
+{
+  "message": null,
+  "query": {
+    "format": "geojson",
+    "points": [
+      {
+        "lat": 55.751244,
+        "lon": 37.618423
+      },
+      {
+        "lat": 55.755814,
+        "lon": 37.617635
+      }
+    ]
+  },
+  "result": [
+    {
+      "algorithm": "with traffic jams",
+      "begin_pedestrian_path": {
+        "geometry": {
+          "selection": "LINESTRING(37.618422 55.751243, 37.619397 55.749189)"
+        }
+      },
+      "end_pedestrian_path": {
+        "geometry": {
+          "selection": "LINESTRING(37.617039 55.756312, 37.617634 55.755813)"
+        }
+      },
+      "filter_road_types": [
+        "highway"
+      ],
+      "id": "2606695632149206903",
+      "maneuvers": [
+        {
+          "comment": "start",
+          "icon": "start",
+          "id": "4651585235537364354",
+          "outcoming_path": {
+            "distance": 417,
+            "duration": 49,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 417,
+                "selection": "LINESTRING(37.619397 55.749189, 37.618555 55.749062, 37.617114 55.748845, 37.616797 55.748790, 37.616460 55.748720, 37.613671 55.748026, 37.613229 55.747910, 37.613166 55.747895)",
+                "style": "normal"
+              }
+            ],
+            "names": [
+              "Кремлёвская набережная"
+            ]
+          },
+          "outcoming_path_comment": "400 m straight",
+          "type": "begin"
+        },
+        {
+          "comment": "Right turn onto Моховая",
+          "icon": "crossroad_right",
+          "id": "1617140653400619578",
+          "outcoming_path": {
+            "distance": 555,
+            "duration": 74,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 61,
+                "selection": "LINESTRING(37.613166 55.747895, 37.613040 55.747894, 37.612903 55.747889, 37.612795 55.747889, 37.612712 55.747891, 37.612590 55.747906, 37.612502 55.747923, 37.612416 55.747944, 37.612321 55.747975, 37.612246 55.748017)",
+                "style": "normal"
+              },
+              {
+                "color": "normal",
+                "length": 207,
+                "selection": "LINESTRING(37.612246 55.748017, 37.611419 55.748705, 37.611392 55.748727, 37.611371 55.748744, 37.611329 55.748768, 37.611275 55.748799, 37.611100 55.748874, 37.611073 55.748881, 37.610801 55.748958, 37.610198 55.749124, 37.609833 55.749227)",
+                "style": "normal"
+              },
+              {
+                "color": "fast",
+                "length": 287,
+                "selection": "LINESTRING(37.609833 55.749227, 37.609782 55.749244, 37.609737 55.749262, 37.609679 55.749299, 37.609455 55.749470, 37.609409 55.749514, 37.609377 55.749561, 37.609345 55.749613, 37.609340 55.749637, 37.609351 55.749721, 37.609375 55.749840, 37.609408 55.749940, 37.609524 55.750144, 37.609968 55.750925, 37.610373 55.751638)",
+                "style": "normal"
+              }
+            ],
+            "names": [
+              "Моховая"
+            ]
+          },
+          "outcoming_path_comment": "600 m straight",
+          "turn_angle": 78,
+          "turn_direction": "right",
+          "type": "crossroad"
+        },
+        {
+          "comment": "Keep right on Моховая",
+          "icon": "crossroad_keep_right",
+          "id": "9363190827195024331",
+          "outcoming_path": {
+            "distance": 592,
+            "duration": 73,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 130,
+                "selection": "LINESTRING(37.610373 55.751638, 37.610668 55.752053, 37.610826 55.752266, 37.610875 55.752326, 37.610958 55.752424, 37.611092 55.752564, 37.611215 55.752690, 37.611236 55.752720)",
+                "style": "normal"
+              },
+              {
+                "color": "fast",
+                "length": 127,
+                "selection": "LINESTRING(37.611236 55.752720, 37.611287 55.752790, 37.611356 55.752894, 37.611798 55.753816)",
+                "style": "normal"
+              },
+              {
+                "color": "fast",
+                "length": 335,
+                "selection": "LINESTRING(37.611798 55.753816, 37.611984 55.754203, 37.612106 55.754391, 37.612264 55.754560, 37.612916 55.755166, 37.613293 55.755516, 37.613634 55.755832, 37.613889 55.756069, 37.614188 55.756301, 37.614261 55.756357, 37.614412 55.756454)",
+                "style": "normal"
+              }
+            ],
+            "names": [
+              "Моховая"
+            ]
+          },
+          "outcoming_path_comment": "600 m straight",
+          "turn_angle": 4,
+          "turn_direction": "keep_right",
+          "type": "crossroad"
+        },
+        {
+          "comment": "Keep right on Моховая",
+          "icon": "crossroad_keep_right",
+          "id": "5432054155346839787",
+          "outcoming_path": {
+            "distance": 448,
+            "duration": 64,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 448,
+                "selection": "LINESTRING(37.614412 55.756454, 37.614845 55.756637, 37.615051 55.756732, 37.615428 55.756941, 37.615491 55.756976, 37.615525 55.756995, 37.615885 55.757209, 37.616106 55.757348, 37.617164 55.758021, 37.617490 55.758218, 37.617688 55.758337, 37.617914 55.758435, 37.618154 55.758495, 37.618405 55.758539, 37.618690 55.758588, 37.619878 55.758794, 37.620053 55.758825)",
+                "style": "normal"
+              }
+            ],
+            "names": [
+              "Моховая"
+            ]
+          },
+          "outcoming_path_comment": "450 m straight",
+          "turn_angle": 14,
+          "turn_direction": "keep_right",
+          "type": "crossroad"
+        },
+        {
+          "comment": "Right turn",
+          "icon": "crossroad_right",
+          "id": "2002724477858871411",
+          "outcoming_path": {
+            "distance": 92,
+            "duration": 22,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 92,
+                "selection": "LINESTRING(37.620053 55.758825, 37.620149 55.758646, 37.620262 55.758433, 37.620484 55.758020)",
+                "style": "normal"
+              }
+            ],
+            "names": []
+          },
+          "outcoming_path_comment": "90 m straight",
+          "turn_angle": 90,
+          "turn_direction": "right",
+          "type": "crossroad"
+        },
+        {
+          "comment": "Keep right",
+          "icon": "crossroad_keep_right",
+          "id": "7108456365011478875",
+          "outcoming_path": {
+            "distance": 304,
+            "duration": 81,
+            "geometry": [
+              {
+                "color": "fast",
+                "length": 127,
+                "selection": "LINESTRING(37.620484 55.758020, 37.620535 55.757856, 37.620535 55.757813, 37.620526 55.757773, 37.620507 55.757738, 37.620476 55.757706, 37.620445 55.757690, 37.620397 55.757677, 37.620292 55.757651, 37.620085 55.757608, 37.619982 55.757590, 37.619907 55.757577, 37.619054 55.757429)",
+                "style": "normal"
+              },
+              {
+                "color": "ignore",
+                "length": 33,
+                "selection": "LINESTRING(37.619054 55.757429, 37.618804 55.757386, 37.618793 55.757383, 37.618784 55.757380, 37.618777 55.757377, 37.618769 55.757373, 37.618695 55.757326, 37.618649 55.757298, 37.618613 55.757274)",
+                "style": "normal"
+              },
+              {
+                "color": "ignore",
+                "length": 144,
+                "selection": "LINESTRING(37.618613 55.757274, 37.617954 55.756856, 37.617917 55.756833, 37.617724 55.756711, 37.617593 55.756628, 37.617425 55.756522, 37.617407 55.756512, 37.617248 55.756422, 37.617111 55.756344, 37.617039 55.756312)",
+                "style": "normal"
+              }
+            ],
+            "names": []
+          },
+          "outcoming_path_comment": "300 m straight",
+          "turn_angle": 9,
+          "turn_direction": "keep_right",
+          "type": "crossroad"
+        },
+        {
+          "comment": "finish",
+          "icon": "finish",
+          "id": "18306322929257932846",
+          "outcoming_path_comment": "You have arrived!",
+          "type": "end"
+        }
+      ],
+      "reliability": 0.0,
+      "route_id": "moscow-cr-back.m9/carrouting/1782417909.689297",
+      "total_distance": 2408,
+      "total_duration": 363,
+      "type": "carrouting",
+      "ui_total_distance": {
+        "unit": "km",
+        "value": "2.4"
+      },
+      "ui_total_duration": "6 min",
+      "waypoints": [
+        {
+          "original_point": {
+            "lat": 55.74918904065404,
+            "lon": 37.61939782653986
+          },
+          "projected_point": {
+            "lat": 55.74918904065404,
+            "lon": 37.61939782653986
+          },
+          "transit": false
+        },
+        {
+          "original_point": {
+            "lat": 55.75631286622442,
+            "lon": 37.61703965908752
+          },
+          "projected_point": {
+            "lat": 55.75631286622442,
+            "lon": 37.61703965908752
+          },
+          "transit": false
+        }
+      ]
+    }
+  ],
+  "type": "result"
+}

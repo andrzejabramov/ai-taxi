@@ -1,0 +1,119 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+#map {
+  flex: 1;
+}
+
+.sidebar {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  border-left: 1px solid #dee2e6;
+}
+
+.sidebar-header {
+  padding: 20px;
+  background: #2563eb;
+  color: white;
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.msg {
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.msg.bot {
+  background: #e8f0fe;
+  color: #1a1a1a;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.msg.user {
+  background: #2563eb;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.controls {
+  padding: 16px;
+  border-top: 1px solid #dee2e6;
+  background: white;
+}
+
+.controls input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.controls input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.controls button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controls button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.controls button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
