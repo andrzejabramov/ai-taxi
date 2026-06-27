@@ -143,3 +143,338 @@ document.getElementById("btn-order").onclick = async () => {
     addMsg("Не удалось создать заказ", "bot");
   }
 };
+
+// ===== Распознавание речи =====
+const micBtn = document.getElementById("btn-mic");
+const addressInput = document.getElementById("address");
+
+// Словарь числительных для нормализации
+const numberWords = {
+  ноль: "0",
+  один: "1",
+  одна: "1",
+  два: "2",
+  две: "2",
+  три: "3",
+  четыре: "4",
+  пять: "5",
+  шесть: "6",
+  семь: "7",
+  восемь: "8",
+  девять: "9",
+  десять: "10",
+  одиннадцать: "11",
+  двенадцать: "12",
+  тринадцать: "13",
+  четырнадцать: "14",
+  пятнадцать: "15",
+  шестнадцать: "16",
+  семнадцать: "17",
+  восемнадцать: "18",
+  девятнадцать: "19",
+  двадцать: "20",
+  тридцать: "30",
+  сорок: "40",
+  пятьдесят: "50",
+  шестьдесят: "60",
+  семьдесят: "70",
+  восемьдесят: "80",
+  девяносто: "90",
+  сто: "100",
+};
+
+function normalizeAddress(text) {
+  let result = text;
+  for (const [word, num] of Object.entries(numberWords)) {
+    const regex = new RegExp(`\\b${word}\\b`, "gi");
+    result = result.replace(regex, num);
+  }
+  result = result
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\s+/g, " ")
+    .trim();
+  return result;
+}
+
+// Диагностика микрофона
+async function checkMicrophone() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // Создаём анализатор для проверки уровня звука
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    // Проверяем уровень звука 2 секунды
+    let hasSound = false;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < 2000) {
+      analyser.getByteFrequencyData(dataArray);
+      const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+      if (avg > 5) {
+        hasSound = true;
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 100));
+    }
+
+    // Останавливаем потоки
+    stream.getTracks().forEach((t) => t.stop());
+    audioContext.close();
+
+    return { ok: true, hasSound };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// Визуальный индикатор уровня звука
+let audioLevelInterval = null;
+let audioContext = null;
+let analyser = null;
+
+function startAudioLevelIndicator(stream) {
+  audioContext = new AudioContext();
+  const source = audioContext.createMediaStreamSource(stream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 256;
+  source.connect(analyser);
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  audioLevelInterval = setInterval(() => {
+    analyser.getByteFrequencyData(dataArray);
+    const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    const level = Math.min(100, avg * 2);
+    micBtn.style.boxShadow = `0 0 ${level}px ${level / 2}px rgba(220, 38, 38, ${level / 100})`;
+  }, 50);
+}
+
+function stopAudioLevelIndicator() {
+  if (audioLevelInterval) {
+    clearInterval(audioLevelInterval);
+    audioLevelInterval = null;
+  }
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+  micBtn.style.boxShadow = "";
+}
+
+if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = "ru-RU";
+  recognition.continuous = false;
+  recognition.interimResults = true; // ← показываем промежуточные результаты
+  recognition.maxAlternatives = 1;
+
+  let isListening = false;
+  let recognitionStream = null;
+  let interimMsgId = null;
+
+  micBtn.onclick = async () => {
+    // Защита от повторных нажатий
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+
+    // Блокируем кнопку
+    isListening = true;
+    micBtn.disabled = true;
+    micBtn.textContent = "⏳";
+
+    try {
+      // 1. Проверяем микрофон
+      addMsg("🎤 Проверяю микрофон...", "bot");
+      const micCheck = await checkMicrophone();
+
+      if (!micCheck.ok) {
+        addMsg(`❌ Микрофон недоступен: ${micCheck.error}`, "bot");
+        resetMicButton();
+        return;
+      }
+
+      if (!micCheck.hasSound) {
+        addMsg(
+          "⚠️ Микрофон работает, но не слышу звука. Говорите громче!",
+          "bot",
+        );
+      } else {
+        addMsg("✅ Микрофон работает. Начинаю запись...", "bot");
+      }
+
+      // 2. Запускаем распознавание
+      micBtn.textContent = "🔴";
+      micBtn.classList.add("recording");
+      micBtn.disabled = false;
+
+      // Получаем поток для индикатора уровня звука
+      recognitionStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      startAudioLevelIndicator(recognitionStream);
+
+      // Таймаут 15 секунд
+      const timeout = setTimeout(() => {
+        if (isListening) {
+          addMsg("⏱ Таймаут. Попробуйте ещё раз.", "bot");
+          recognition.stop();
+        }
+      }, 15000);
+
+      recognition._timeout = timeout;
+      recognition.start();
+    } catch (e) {
+      console.error("Mic init error:", e);
+      addMsg(`❌ Ошибка: ${e.message}`, "bot");
+      resetMicButton();
+    }
+  };
+
+  function resetMicButton() {
+    isListening = false;
+    micBtn.disabled = false;
+    micBtn.textContent = "🎤";
+    micBtn.classList.remove("recording");
+    stopAudioLevelIndicator();
+    if (recognitionStream) {
+      recognitionStream.getTracks().forEach((t) => t.stop());
+      recognitionStream = null;
+    }
+    if (recognition._timeout) {
+      clearTimeout(recognition._timeout);
+      recognition._timeout = null;
+    }
+  }
+
+  recognition.onresult = (event) => {
+    let interimTranscript = "";
+    let finalTranscript = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript;
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+
+    // Показываем промежуточный результат
+    if (interimTranscript) {
+      addressInput.value = interimTranscript;
+      addressInput.style.background = "#fef3c7"; // жёлтый фон
+    }
+
+    // Финальный результат
+    if (finalTranscript) {
+      const normalized = normalizeAddress(finalTranscript);
+      addressInput.value = normalized;
+      addressInput.style.background = ""; // убираем жёлтый
+
+      addMsg(`🎙 Распознано: ${normalized}`, "bot");
+
+      resetMicButton();
+
+      // Автозапуск поиска
+      setTimeout(() => document.getElementById("btn-search").click(), 300);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech error:", event.error);
+
+    const messages = {
+      "no-speech": "🔇 Не слышу речь. Говорите громче и чётче.",
+      "audio-capture": "❌ Микрофон не найден. Проверьте подключение.",
+      "not-allowed":
+        "❌ Доступ к микрофону запрещён. Разрешите в настройках браузера.",
+      network: "❌ Ошибка сети. Web Speech API требует интернет.",
+      aborted: "⏹ Распознавание прервано.",
+      "service-not-allowed": "❌ Сервис распознавания недоступен.",
+    };
+
+    addMsg(messages[event.error] || `❌ Ошибка: ${event.error}`, "bot");
+    resetMicButton();
+  };
+
+  recognition.onend = () => {
+    // Если не получили финальный результат
+    if (isListening && !addressInput.value) {
+      addMsg("⏹ Распознавание завершено без результата.", "bot");
+    }
+    resetMicButton();
+  };
+
+  // Проверка поддержки при загрузке
+  addMsg("🎤 Голосовой ввод доступен. Нажмите на микрофон для записи.", "bot");
+} else {
+  micBtn.disabled = true;
+  micBtn.title =
+    "Распознавание речи не поддерживается. Используйте Chrome или Edge.";
+  addMsg(
+    "❌ Ваш браузер не поддерживает распознавание речи. Используйте Chrome или Edge.",
+    "bot",
+  );
+}
+
+// ===== Обработка событий от модуля распознавания речи =====
+document.addEventListener("DOMContentLoaded", () => {
+  // Инициализируем модуль речи
+  SpeechModule.init("btn-mic", "address");
+
+  // Слушаем статусы
+  window.addEventListener("speech:status", (e) => {
+    addMsg(e.detail.message, "bot");
+  });
+
+  // Слушаем промежуточные результаты (опционально — можно не использовать)
+  window.addEventListener("speech:interim", (e) => {
+    // console.log("Interim:", e.detail.text);
+  });
+
+  // Слушаем финальные результаты
+  window.addEventListener("speech:result", (e) => {
+    const { text, isAddress } = e.detail;
+
+    if (isAddress) {
+      // Это адрес — геокодим
+      addMsg(`📍 Ищу: ${text}`, "user");
+      setTimeout(() => document.getElementById("btn-search").click(), 300);
+    } else {
+      // Это чат — отправляем в LLM
+      document.getElementById("address").value = ""; // очищаем поле
+      sendToChat(text);
+    }
+  });
+});
+
+// Функция отправки в чат (вынесена из speech.js)
+async function sendToChat(message) {
+  addMsg(message, "user");
+  history.push({ role: "user", content: message });
+
+  try {
+    const response = await fetch(`${API}/chat/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, history }),
+    });
+    const data = await response.json();
+    addMsg(data.reply, "bot");
+    history.push({ role: "assistant", content: data.reply });
+  } catch (error) {
+    console.error("Chat failed:", error);
+    addMsg("❌ Ошибка связи с агентом", "bot");
+  }
+}

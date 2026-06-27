@@ -7,7 +7,7 @@ from loguru import logger
 from src.middleware.request_id import RequestIDMiddleware
 from src.middleware.logging import LoggingMiddleware
 from src.db.pools import init_pools, close_pools
-from src.routers import chat, geo, trips
+from src.routers import chat, geo, trips, speech
 from src.logger_config import setup_logger
 from src.exceptions.base import ValidationError
 
@@ -52,6 +52,7 @@ app.add_middleware(LoggingMiddleware)
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(geo.router, prefix="/api/v1")
 app.include_router(trips.router, prefix="/api/v1")
+app.include_router(speech.router, prefix="/api/v1")
 
 
 # Exception handlers

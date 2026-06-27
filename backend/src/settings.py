@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # === Yandex Geocoder ===
     YANDEX_GEOCODER_API_KEY: Optional[str] = None
 
+    # === Yandex SpeechKit ===
+    YANDEX_SPEECHKIT_API_KEY: Optional[str] = None
+
     @property
     def use_2gis(self) -> bool:
         return bool(self.DGIS_API_KEY)

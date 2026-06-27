@@ -6,6 +6,7 @@ from typing import Optional
 from src.settings import settings
 from src.schemas.chat import ChatMessage
 from src.middleware.request_id import request_id_ctx
+from src.knowledge.loader import get_system_prompt
 
 # ============================================
 # CONSTANTS
@@ -22,12 +23,11 @@ FALLBACK_MODELS = [
     "deepseek/deepseek-chat-v3-0324:free",
 ]
 
-SYSTEM_PROMPT = (
-    "Ты — корпоративный ассистент заказа такси. "
-    "Отвечай коротко, вежливо, по-русски. "
-    "На первое сообщение пользователя отвечай приветствием и вопросом 'Куда поедем?'. "
-    "Не выдумывай адреса, не давай маршруты — этим занимается карта."
-)
+
+# Динамический системный промпт из базы знаний
+def get_current_system_prompt() -> str:
+    """Возвращает актуальный системный промпт из базы знаний"""
+    return get_system_prompt()
 
 
 # ============================================
@@ -103,7 +103,19 @@ async def get_available_free_models() -> list[str]:
             # Модель должна быть активной
             has_context = m.get("context_length", 0) > 0
 
-            if is_free and has_context:
+            # Исключаем safety-модели (они не генерируют текст)
+            is_safety_model = any(
+                keyword in model_id.lower()
+                for keyword in [
+                    "safety",
+                    "content-safety",
+                    "moderation",
+                    "classifier",
+                    "moderation",
+                ]
+            )
+
+            if is_free and has_context and not is_safety_model:
                 free_models.append(model_id)
 
         # Берём топ-N моделей
@@ -171,7 +183,7 @@ async def _try_call_model(
             "model": model,
             "messages": messages,
             "temperature": 0.4,
-            "max_tokens": 200,
+            "max_tokens": 800,
         },
         timeout=settings.OPENROUTER_TIMEOUT,
     )
@@ -196,6 +208,51 @@ async def _try_call_model(
 
 
 # ============================================
+# RESPONSE CLEANUP
+# ============================================
+def clean_model_response(text: str) -> str:
+    """
+    Очищает ответ модели от служебных префиксов и тегов.
+    Некоторые бесплатные модели на OpenRouter добавляют
+    "User Safety: safe", "Safety: safe" и т.п.
+    """
+    if not text:
+        return text
+
+    # Паттерны для удаления
+    prefixes_to_remove = [
+        "User Safety: safe",
+        "Safety: safe",
+        "Safety check: passed",
+        "Safety rating: safe",
+        "Content safety: safe",
+        "Safety: PASSED",
+        "Safety: PASS",
+    ]
+
+    cleaned = text.strip()
+
+    # Удаляем префиксы в начале
+    for prefix in prefixes_to_remove:
+        if cleaned.startswith(prefix):
+            cleaned = cleaned[len(prefix) :].strip()
+            # Удаляем возможные разделители
+            if cleaned.startswith(("-", "—", ":", "|")):
+                cleaned = cleaned[1:].strip()
+
+    # Удаляем префиксы в любом месте (если модель вставила их в середину)
+    for prefix in prefixes_to_remove:
+        cleaned = cleaned.replace(prefix, "").strip()
+
+    # Удаляем двойные пробелы и переносы
+    import re
+
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+
+    return cleaned
+
+
+# ============================================
 # MAIN CHAT FUNCTION
 # ============================================
 async def chat_with_agent(message: str, history: list[ChatMessage]) -> str:
@@ -208,7 +265,7 @@ async def chat_with_agent(message: str, history: list[ChatMessage]) -> str:
     request_id = request_id_ctx.get()
 
     # Формируем messages
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": get_current_system_prompt()}]
     messages.extend(
         [{"role": msg.role, "content": msg.content} for msg in history[-10:]]
     )
@@ -245,7 +302,7 @@ async def chat_with_agent(message: str, history: list[ChatMessage]) -> str:
                         "reply_length": len(reply),
                     },
                 )
-                return reply
+                return clean_model_response(reply)
 
             except httpx.HTTPStatusError as e:
                 status = e.response.status_code
