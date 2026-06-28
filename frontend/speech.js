@@ -119,6 +119,10 @@ const SpeechModule = (function () {
   }
 
   function isLikelyAddress(text) {
+    const isChat = isJustChatPhrase(text);
+    console.log(`🔍 isLikelyAddress("${text}") → isChat=${isChat}`);
+
+    if (isChat) return false;
     // ✅ Сначала проверяем стоп-слова
     if (isJustChatPhrase(text)) return false;
 

@@ -12,8 +12,126 @@
   </head>
   <body>
     <div class="layout">
-      <div id="map"></div>
+      <!-- Левая часть: дашборд или развёрнутый блок -->
+      <div class="main-content">
+        <!-- Режим: Дашборд -->
+        <div id="dashboard-view" class="view active">
+          <div class="dashboard-grid">
+            <!-- Блок: Карта -->
+            <div
+              class="dashboard-block"
+              id="block-map"
+              onclick="switchView('map')"
+            >
+              <div class="block-header">
+                <h3>🗺 Карта</h3>
+              </div>
+              <div class="block-content">
+                <div id="map-preview"></div>
+              </div>
+            </div>
 
+            <!-- Блок: Поездки -->
+            <div
+              class="dashboard-block"
+              id="block-trips"
+              onclick="switchView('trips')"
+            >
+              <div class="block-header">
+                <h3>📋 История поездок</h3>
+              </div>
+              <div class="block-content">
+                <div id="trips-preview">
+                  <div class="empty-state">
+                    <p>Загрузка...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Режим: Развёрнутая карта -->
+        <div id="map-view" class="view">
+          <div class="view-header">
+            <button class="btn-back" onclick="switchView('dashboard')">
+              ← Назад
+            </button>
+            <button class="btn-home" onclick="switchView('dashboard')">
+              🏠
+            </button>
+            <h2>🗺 Карта</h2>
+          </div>
+          <div class="view-content">
+            <div id="map-full"></div>
+            <div class="map-controls">
+              <input id="address" placeholder="Куда поедем? (адрес)" />
+              <button id="btn-mic" class="mic-btn" title="Голосовой ввод">
+                🎤
+              </button>
+              <button id="btn-search">🔍 Найти</button>
+              <button id="btn-order" disabled>🚕 Заказать</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Режим: Развёрнутая таблица поездок -->
+        <div id="trips-view" class="view">
+          <div class="view-header">
+            <button class="btn-back" onclick="switchView('dashboard')">
+              ← Назад
+            </button>
+            <button class="btn-home" onclick="switchView('dashboard')">
+              🏠
+            </button>
+            <h2>📋 История поездок</h2>
+          </div>
+          <div class="view-content">
+            <div id="trips-table-container">
+              <table class="trips-table">
+                <thead>
+                  <tr>
+                    <th>Дата</th>
+                    <th>Откуда</th>
+                    <th>Куда</th>
+                    <th>Расстояние</th>
+                    <th>Время</th>
+                    <th>Тариф</th>
+                    <th>Стоимость</th>
+                    <th>Статус</th>
+                  </tr>
+                </thead>
+                <tbody id="trips-tbody">
+                  <tr>
+                    <td colspan="8">Загрузка...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Режим: Карточка поездки -->
+        <div id="trip-detail-view" class="view">
+          <div class="view-header">
+            <button class="btn-back" onclick="switchView('trips')">
+              ← К списку
+            </button>
+            <button class="btn-home" onclick="switchView('dashboard')">
+              🏠
+            </button>
+            <h2>🚗 Детали поездки</h2>
+          </div>
+          <div class="view-content trip-detail-content">
+            <div id="trip-map-container"></div>
+            <div id="trip-info-container">
+              <!-- Заполняется динамически -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Правая часть: Чат -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <h2>🚕 Такси-агент</h2>
@@ -23,14 +141,10 @@
 
         <div class="controls">
           <div class="address-row">
-            <input id="address" placeholder="Куда поедем? (адрес)" />
-            <button id="btn-mic" class="mic-btn" title="Голосовой ввод">
+            <input id="address-chat" placeholder="Спросите агента..." />
+            <button id="btn-mic-chat" class="mic-btn" title="Голосовой ввод">
               🎤
             </button>
-          </div>
-          <div class="button-row">
-            <button id="btn-search">🔍 Найти</button>
-            <button id="btn-order" disabled>🚕 Заказать</button>
           </div>
         </div>
       </aside>
@@ -38,6 +152,10 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="speech.js"></script>
+    <script src="chat.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="map.js"></script>
+    <script src="trips.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
