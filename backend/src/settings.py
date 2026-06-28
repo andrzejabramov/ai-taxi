@@ -15,12 +15,10 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     ENVIRONMENT: str = "development"
 
-    # === Database ===
-    DB_HOST: str = "postgres"
-    DB_PORT: int = 5432
-    DB_NAME: str = "taxi_agent"
-    DB_USER: str = "execute"
-    DB_PASSWORD: str = ""
+    # === Database (только строка подключения, всё остальное в docker-compose) ===
+    DATABASE_URL: str  # обязательное, читается из environment
+
+    # === Database Pool ===
     DB_POOL_MIN: int = 5
     DB_POOL_MAX: int = 20
 
@@ -46,10 +44,6 @@ class Settings(BaseSettings):
     @property
     def use_yandex_geocoder(self) -> bool:
         return bool(self.YANDEX_GEOCODER_API_KEY)
-
-    @property
-    def database_url(self) -> str:
-        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     class Config:
         case_sensitive = True

@@ -11,14 +11,14 @@ async def init_pools():
 
     if write_pool is None:
         write_pool = await create_pool(
-            settings.database_url,
+            settings.DATABASE_URL,  # ← просто поле, без методов
             min_size=settings.DB_POOL_MIN,
             max_size=settings.DB_POOL_MAX,
         )
 
     if read_pool is None:
         read_pool = await create_pool(
-            settings.database_url,
+            settings.DATABASE_URL,  # ← просто поле
             min_size=settings.DB_POOL_MIN,
             max_size=settings.DB_POOL_MAX,
         )
@@ -38,14 +38,12 @@ async def close_pools():
 
 
 def get_write_pool() -> Pool:
-    """Получить пул для записи"""
     if write_pool is None:
         raise RuntimeError("Write pool not initialized")
     return write_pool
 
 
 def get_read_pool() -> Pool:
-    """Получить пул для чтения"""
     if read_pool is None:
         raise RuntimeError("Read pool not initialized")
     return read_pool
